@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'elasticsearch' => [
+        'host'     => env('ELASTICSEARCH_HOST', 'localhost'),
+        'port'     => env('ELASTICSEARCH_PORT', '9200'),
+        'user'     => env('ELASTICSEARCH_USER'),
+        'scheme'   => env('ELASTICSEARCH_SCHEME', 'http'),
+        'password' => env('ELASTICSEARCH_PASS'),
+        'api_key'  => env('ELASTIC_API_KEY'),
+        'cloud_id' => env('ELASTIC_CLOUD_ID'),
+        'https'    => env('ELASTIC_HTTPS', TRUE),
+    ],
+
 ];
