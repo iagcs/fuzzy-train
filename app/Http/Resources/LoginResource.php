@@ -4,10 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Laravel\Sanctum\NewAccessToken;
 
 /**
- * @property-read \App\Models\User $resource
+ * @property-read \app\Models\User $resource
  */
 class LoginResource extends JsonResource
 {
