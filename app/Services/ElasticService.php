@@ -9,30 +9,17 @@ class ElasticService
 {
     public function __construct(private readonly Client $client) {}
 
-    /**
-     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
-     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
-     * @throws \Elastic\Elasticsearch\Exception\MissingParameterException
-     */
-    public function createDocument(array $body): void
+    public function bulkDocuments(array $data): void
     {
-        $this->client->index([
-            'index' => 'articles',
-            'body' => [
-                "title" => "Esse eh um teste no laravel",
-                "body" => "ola estou testando",
-                "author" => "Iago Souto",
-                "published_date" => "2024-12-04",
-                "content" => "teste"
-            ]
-        ]);
-    }
+        $body = [];
 
-    public function bulkDocuments(array &$body): void
-    {
+        foreach ($data as $datum){
+            $body[] = ['index' => ['_index' => 'articles']];
+            $body[] = $datum;
+        }
+
         try {
-            $response = $this->client->bulk(compact('body'));
-            dd($response->getStatusCode());
+            $this->client->bulk(compact('body'));
         } catch (\Exception $e) {
             \Log::error('Failed to create index document: '.$e->getMessage());
             throw $e;
@@ -46,14 +33,41 @@ class ElasticService
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [
-                            'match_phrase' => ['title' => 'Getting Started with Elasticsearch']
-                        ]
-                    ]
-                ]
+                        'should' => [
+                            [
+                                'match' => [
+                                    'author' => [
+                                        'query' => 'sdasdasdasd author2',
+                                        'operator' => 'or',
+                                        'fuzziness' => 'AUTO',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'match' => [
+                                    'category' => [
+                                        'query' => 'adsasdasd',
+                                        'operator' => 'or',
+                                        'fuzziness' => 'AUTO',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'match' => [
+                                    'source' => [
+                                        'query' => 'washingt',
+                                        'fuzziness' => 'AUTO',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'minimum_should_match' => 1,
+                    ],
+                ],
+                'sort' => [
+                    ['_score' => ['order' => 'desc']],
+                ],
             ]
         ]);
-
-        dd(Arr::pluck($response['hits']['hits'], '_source'));
     }
 }
