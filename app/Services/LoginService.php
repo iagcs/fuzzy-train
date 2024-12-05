@@ -3,8 +3,7 @@
 namespace App\Services;
 
 
-use App\Exceptions\UserLoginDataIncorrect;
-use App\Models\User;
+use app\Models\User;
 
 class LoginService
 {
