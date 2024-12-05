@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('preferred_sources', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->string('source');
+            $table->string('source')->unique();
 
             $table->timestamps();
         });

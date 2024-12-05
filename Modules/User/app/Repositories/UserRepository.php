@@ -15,4 +15,11 @@ class UserRepository
             'sources'    => $user->preferredSources()->pluck('source')->implode(' '),
         ];
     }
+
+    public function setNewsPreference(User $user, array $preferences): void
+    {
+        $user->preferredAuthors()->sync($preferences['authors']);
+        $user->preferredSources()->sync($preferences['sources']);
+        $user->preferredCategories()->sync($preferences['categories']);
+    }
 }
