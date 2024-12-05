@@ -5,9 +5,9 @@ namespace App\Services;
 use Elastic\Elasticsearch\Client;
 use Illuminate\Support\Arr;
 
-class ElasticService
+readonly class ElasticService
 {
-    public function __construct(private readonly Client $client) {}
+    public function __construct(private Client $client) {}
 
     public function bulkDocuments(array $data): void
     {
@@ -26,48 +26,17 @@ class ElasticService
         }
     }
 
-    public function searchDocument()
+    /**
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     */
+    public function search(array $body)
     {
         $response = $this->client->search([
             'index' => 'articles',
-            'body' => [
-                'query' => [
-                    'bool' => [
-                        'should' => [
-                            [
-                                'match' => [
-                                    'author' => [
-                                        'query' => 'sdasdasdasd author2',
-                                        'operator' => 'or',
-                                        'fuzziness' => 'AUTO',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'match' => [
-                                    'category' => [
-                                        'query' => 'adsasdasd',
-                                        'operator' => 'or',
-                                        'fuzziness' => 'AUTO',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'match' => [
-                                    'source' => [
-                                        'query' => 'washingt',
-                                        'fuzziness' => 'AUTO',
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'minimum_should_match' => 1,
-                    ],
-                ],
-                'sort' => [
-                    ['_score' => ['order' => 'desc']],
-                ],
-            ]
+            ...$body
         ]);
+
+        return $response['hits']['hits'];
     }
 }

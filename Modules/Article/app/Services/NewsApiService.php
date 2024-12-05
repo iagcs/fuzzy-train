@@ -2,52 +2,57 @@
 
 namespace Modules\Article\Services;
 
+use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Modules\Article\DTOs\ArticleDto;
 
-class NewsApiService extends ArticleNewsApiService
+class NewsApiService extends ArticlesApiServiceBase
 {
     /**
      * @throws \Exception
      */
-    public function getNewsData(): array
+    protected function getNewsData(): array
     {
         try {
             $response = $this->client()->get('/everything');
 
-            return $this->formatNewsData($response->json()['articles']);
+            return $response->json()['articles'];
         } catch (GuzzleException $e) {
             throw new \RuntimeException('Failed to fetch news data');
         }
     }
 
-    public function getBaseUrl(): string
+    protected function getBaseUrl(): string
     {
         return config('apis.news_api.url');
     }
 
-    public function getQueryParams(): array
+    protected function getQueryParams(): array
     {
         return [
-            'apiKey' => config('apis.news_api.key'),
-            'from' => today()->subDay()->format('Y-m-d'),
-            'to' => today()->subDay()->format('Y-m-d'),
+            'apiKey'   => config('apis.news_api.key'),
+            'from'     => today()->subDay()->format('Y-m-d'),
+            'to'       => today()->subDay()->format('Y-m-d'),
             'language' => 'en',
-            'sources' => 'bbc-news,abc-news'
+            'sources'  => 'bbc-news,abc-news',
         ];
     }
 
-    public function formatNewsData(array $data): array
+    protected function getArticleData(array $data): ArticleDto
     {
-        return \Arr::map($data, static function(array $datum){
-            return [
-                'title'    => $datum['title'],
-                'content'  => $datum['content'],
-                'url'      => $datum['url'],
-                'source'   => $datum['source']['name'],
-                'author'   => $datum['author'],
-                'category' => $datum['category'] ?? 'general',
-            ];
-        });
+        return ArticleDto::from([
+            'id'           => \Str::orderedUuid()->toString(),
+            'title'        => $data['title'] ?? 'unknown',
+            'content'      => $data['content'] ?? 'unknown',
+            'url'          => $data['url'] ?? 'unknown',
+            'source'       => $data['source']['name'] ?? 'unknown',
+            'author'       => $data['author'] ?? 'unknown',
+            'category'     => $data['category'] ?? 'general',
+            'published_at' => Carbon::parse($data['publishedAt'])->format('Y-m-d h:m:s'),
+            'created_at'   => now()->addDay(3),
+            'updated_at'   => now(),
+        ]);
     }
 }

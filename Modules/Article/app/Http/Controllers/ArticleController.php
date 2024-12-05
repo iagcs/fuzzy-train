@@ -4,62 +4,26 @@ namespace Modules\Article\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Article\Http\Resources\ArticleResource;
+use Modules\Article\Models\Article;
+use Modules\Article\Services\ArticleService;
+use Modules\User\Models\User;
 
 class ArticleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private readonly ArticleService $service) {}
+
+    public function show(Article $article): ArticleResource
     {
-        return view('article::index');
+        return ArticleResource::make($article);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
+     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
      */
-    public function create()
+    public function articles(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return view('article::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('article::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('article::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
+        return ArticleResource::collection($this->service->getPreferenceArticles(User::first()));
     }
 }
