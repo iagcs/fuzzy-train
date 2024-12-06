@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('preferreds', function (Blueprint $table) {
+        Schema::create('news_preferences', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
             $table->uuidMorphs('preferred');
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('preferreds');
+        Schema::dropIfExists('news_preferences');
     }
 };

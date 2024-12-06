@@ -14,6 +14,12 @@ use Modules\User\Http\Controllers\UserController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('user', UserController::class)->names('user');
+Route::prefix('user')->controller(UserController::class)->group(function(){
+    Route::post('', 'store');
+    Route::get('', 'show');
+});
+
+Route::prefix('preference')->controller(\Modules\User\Http\Controllers\NewsPreferenceController::class)->group(function(){
+    Route::post('', 'store');
+    Route::get('', 'show');
 });

@@ -22,6 +22,6 @@ class PreferredSource extends Model
 
     public function tags(): MorphToMany
     {
-        return $this->morphToMany(User::class, 'preferred');
+        return $this->morphToMany(User::class, 'news_preference');
     }
 }
