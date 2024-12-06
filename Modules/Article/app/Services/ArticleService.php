@@ -3,8 +3,12 @@
 namespace Modules\Article\Services;
 
 use App\Services\ElasticService;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Modules\Article\DTOs\ArticleDto;
 use Modules\Article\Repositories\ArticleRepository;
+use Modules\User\Enums\ValidSearchFields;
 use Modules\User\Models\User;
 use Modules\User\Repositories\UserRepository;
 
@@ -26,15 +30,16 @@ readonly class ArticleService
     }
 
     /**
-     * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
-     * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
+     * @throws \JsonException
      */
     public function getPreferenceArticles(User $user): array
     {
         $preferredData = $this->userRepository->getPreferredArticleData($user);
 
-        $body = [
-            'query' => [
+        $cacheKey = 'search-' . $user->id . '-' . md5(json_encode($preferredData, JSON_THROW_ON_ERROR));
+
+        return Cache::remember($cacheKey, 3600, function() use($preferredData) {
+            $query = [
                 'bool' => [
                     'should'               => [
                         [
@@ -67,9 +72,66 @@ readonly class ArticleService
                     ],
                     'minimum_should_match' => 1,
                 ],
-            ],
+            ];
+
+            return $this->articleRepository->optimizedSearch($query);
+        });
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function search(string $user_id, array $filters): array
+    {
+        $cacheKey = 'search-' . $user_id . '-' . md5(json_encode($filters, JSON_THROW_ON_ERROR));
+
+        return Cache::remember($cacheKey, 3600, function() use($filters){
+            $query = empty($filters) ? ['match_all' => []] : $this->buildQueryForFilters($filters);
+
+            return $this->articleRepository->optimizedSearch($query);
+        });
+    }
+
+    private function buildQueryForFilters(array $filters): array
+    {
+        $mustQuery = [
+            'must' => [],
         ];
 
-        return $this->articleRepository->optimizedSearch(compact('body'));
+        if (!empty($filters[ValidSearchFields::KEYWORD->value])) {
+            $mustQuery['must'][] = [
+                'multi_search' => [
+                    "query"  => $filters['keyword'],
+                    "fields" => ["title", "content"],
+                    "type"   => "phrase",
+                ],
+            ];
+        }
+
+        if (!empty($filters[ValidSearchFields::CATEGORY->value])) {
+            $mustQuery['must'][] = [
+                'match' => [
+                    'category' => $filters['category'],
+                ],
+            ];
+        }
+
+        if (!empty($filters[ValidSearchFields::SOURCE->value])) {
+            $mustQuery['must'][] = [
+                'match' => [
+                    'source' => $filters['source'],
+                ],
+            ];
+        }
+
+        if (!empty($filters[ValidSearchFields::FROM->value])) {
+            $mustQuery['must'][] = [
+                'term' => [
+                    'published_at' => $filters['from'],
+                ],
+            ];
+        }
+
+        return ['bool' => $mustQuery];
     }
 }
