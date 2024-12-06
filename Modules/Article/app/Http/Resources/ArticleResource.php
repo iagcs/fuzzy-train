@@ -5,6 +5,9 @@ namespace Modules\Article\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property-read \Modules\Article\DTOs\ArticleDto $resource
+ */
 class ArticleResource extends JsonResource
 {
     /**
@@ -13,13 +16,13 @@ class ArticleResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'       => $this->resource['id'],
-            'title'    => $this->resource['title'],
-            'content'  => $this->resource['content'],
-            'url'      => $this->resource['url'],
-            'source'   => $this->resource['source'],
-            'author'   => $this->resource['author'],
-            'category' => $this->resource['category'],
+            'id'       => $this->resource->id,
+            'title'    => $this->resource->title,
+            'content'  => $this->resource->content,
+            'url'      => $this->resource->url,
+            'source'   => $this->resource->source,
+            'author'   => $this->resource->author,
+            'category' => $this->resource->category,
         ];
     }
 }

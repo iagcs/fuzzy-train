@@ -4,6 +4,7 @@ namespace Modules\Article\Repositories;
 
 use App\Services\ElasticService;
 use Illuminate\Support\Collection;
+use Modules\Article\DTOs\ArticleDto;
 use Modules\Article\Models\Article;
 
 readonly class ArticleRepository
@@ -27,8 +28,14 @@ readonly class ArticleRepository
      * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
      * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
      */
-    public function optimizedSearch(array $body): array
+    public function optimizedSearch(array $query): array
     {
-        return $this->elasticService->search(compact('body'));
+        $body = [
+            'query' => $query
+        ];
+
+        $result = $this->elasticService->search(compact('body'));
+
+        return ArticleDto::collect(\Arr::pluck($result, '_source'));
     }
 }
