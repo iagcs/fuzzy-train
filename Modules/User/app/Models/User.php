@@ -10,15 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\User\Database\Factories\UserFactory;
 use Modules\User\Dtos\UserDto;
-use Modules\User\Models\PreferredAuthor;
-use Modules\User\Models\PreferredCategory;
-use Modules\User\Models\PreferredSource;
 use Spatie\LaravelData\WithData;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Modules\User\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens, CanResetPassword, HasUuids, WithData;
 
     protected $dataClass = UserDto::class;
@@ -76,4 +74,9 @@ class User extends Authenticatable
     {
         $this->notify(new ResetPassword($token));
     }
+
+    protected static function newFactory(): UserFactory
+     {
+          return UserFactory::new();
+     }
 }
