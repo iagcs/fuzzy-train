@@ -17,7 +17,7 @@ class PreferredCategoryResource extends JsonResource
     {
         return [
             'id'     => $this->resource->id,
-            'source' => $this->resource->source,
+            'category' => $this->resource->category,
         ];
     }
 }

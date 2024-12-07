@@ -2,12 +2,9 @@
 
 namespace Modules\User\Models;
 
-use app\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-
-// use Modules\User\Database\Factories\PreferredSourceFactory;
 
 class PreferredSource extends Model
 {
