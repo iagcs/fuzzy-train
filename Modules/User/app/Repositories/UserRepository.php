@@ -4,18 +4,31 @@ namespace Modules\User\Repositories;
 
 
 use Illuminate\Support\Facades\Cache;
+use Modules\User\Dtos\UserDto;
 use Modules\User\Models\User;
 
 class UserRepository
 {
-	public function getPreferredArticleData(User $user): array
-	{
-		return [
-			'authors'    => $user->preferredAuthors()->pluck('author')->implode(' '),
-			'categories' => $user->preferredCategories()->pluck('category')->implode(' '),
-			'sources'    => $user->preferredSources()->pluck('source')->implode(' '),
-		];
-	}
+    /**
+     * @throws \Spatie\LaravelData\Exceptions\InvalidDataClass
+     */
+    public function create(UserDto $userDto): UserDto
+    {
+        return User::query()
+            ->create($userDto->toArray())
+            ->getData();
+    }
+
+    public function getPreferredArticleData(User $user): array
+    {
+        $preferredData = [
+            'author'   => $user->preferredAuthors()->exists() ? $user->preferredAuthors()->pluck('author')->toArray() : [],
+            'category' => $user->preferredCategories()->exists() ? $user->preferredCategories()->pluck('category')->toArray() : [],
+            'source'   => $user->preferredSources()->exists() ? $user->preferredSources()->pluck('source')->toArray() : [],
+        ];
+
+        return array_filter($preferredData);
+    }
 
     /**
      * @throws \JsonException
@@ -24,9 +37,16 @@ class UserRepository
 	{
         $this->clearCacheWhenChangePreferences($user->id, $this->getPreferredArticleData($user));
 
-		$user->preferredAuthors()->sync($preferences['authors']);
-		$user->preferredSources()->sync($preferences['sources']);
-		$user->preferredCategories()->sync($preferences['categories']);
+        \DB::transaction(static function () use ($user, $preferences){
+            $user->preferredAuthors()->detach();
+            $user->preferredAuthors()->sync($preferences['authors'] ?? []);
+
+            $user->preferredSources()->detach();
+            $user->preferredSources()->sync($preferences['sources'] ?? []);
+
+            $user->preferredCategories()->detach();
+            $user->preferredCategories()->sync($preferences['categories'] ?? []);
+        });
 	}
 
     /**

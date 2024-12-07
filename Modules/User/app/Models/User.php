@@ -10,14 +10,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\User\Dtos\UserDto;
 use Modules\User\Models\PreferredAuthor;
 use Modules\User\Models\PreferredCategory;
 use Modules\User\Models\PreferredSource;
+use Spatie\LaravelData\WithData;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, CanResetPassword, HasUuids;
+    use HasFactory, Notifiable, HasApiTokens, CanResetPassword, HasUuids, WithData;
+
+    protected $dataClass = UserDto::class;
 
     /**
      * The attributes that are mass assignable.
@@ -55,17 +59,17 @@ class User extends Authenticatable
 
     public function preferredAuthors(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
-        return $this->morphedByMany(PreferredAuthor::class, 'preferred');
+        return $this->morphedByMany(PreferredAuthor::class, 'news_preference');
     }
 
     public function preferredSources(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
-        return $this->morphedByMany(PreferredSource::class, 'preferred');
+        return $this->morphedByMany(PreferredSource::class, 'news_preference');
     }
 
     public function preferredCategories(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
-        return $this->morphedByMany(PreferredCategory::class, 'preferred');
+        return $this->morphedByMany(PreferredCategory::class, 'news_preference');
     }
 
     public function sendPasswordResetNotification($token): void

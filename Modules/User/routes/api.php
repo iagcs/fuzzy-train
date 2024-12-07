@@ -16,7 +16,6 @@ use Modules\User\Http\Controllers\UserController;
 
 Route::prefix('user')->controller(UserController::class)->group(function(){
     Route::post('', 'store');
-    Route::get('', 'show');
 });
 
 Route::prefix('preference')->controller(\Modules\User\Http\Controllers\NewsPreferenceController::class)->group(function(){
