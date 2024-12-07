@@ -29,6 +29,7 @@ class ArticleController extends Controller
 	}
 
     /**
+     * @throws \JsonException
      */
     public function search(ArticleSearchRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
@@ -38,9 +39,10 @@ class ArticleController extends Controller
     /**
      * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
      * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
+     * @throws \JsonException
      */
     public function articles(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return ArticleResource::collection($this->service->getPreferenceArticles(\Auth::user()));
+        return ArticleResource::collection($this->service->fetchUserPreferredArticles(\Auth::user()));
     }
 }

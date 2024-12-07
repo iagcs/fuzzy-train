@@ -20,5 +20,7 @@ use Modules\Article\Http\Controllers\ArticleController;
 
 Route::prefix('article')->controller(ArticleController::class)->group(function(){
     //Route::get('/{article}', 'show');
+    Route::get('/', 'index');
     Route::get('/preferred', 'articles');
+    Route::get('/{article}', 'show');
 });

@@ -32,50 +32,42 @@ readonly class ArticleService
     /**
      * @throws \JsonException
      */
-    public function getPreferenceArticles(User $user): array
+    public function fetchUserPreferredArticles(User $user): array
     {
         $preferredData = $this->userRepository->getPreferredArticleData($user);
+
+        abort_if(empty($preferredData), 400, 'User dont have preferences set.');
 
         $cacheKey = 'search-' . $user->id . '-' . md5(json_encode($preferredData, JSON_THROW_ON_ERROR));
 
         return Cache::remember($cacheKey, 3600, function() use($preferredData) {
-            $query = [
-                'bool' => [
-                    'should'               => [
-                        [
-                            'match' => [
-                                'author' => [
-                                    'query'     => $preferredData['authors'],
-                                    'operator'  => 'or',
-                                    'fuzziness' => 'AUTO',
-                                ],
-                            ],
-                        ],
-                        [
-                            'match' => [
-                                'category' => [
-                                    'query'     => $preferredData['categories'],
-                                    'operator'  => 'or',
-                                    'fuzziness' => 'AUTO',
-                                ],
-                            ],
-                        ],
-                        [
-                            'match' => [
-                                'source' => [
-                                    'query'     => $preferredData['sources'],
-                                    'operator'  => 'or',
-                                    'fuzziness' => 'AUTO',
-                                ],
-                            ],
-                        ],
-                    ],
-                    'minimum_should_match' => 1,
-                ],
-            ];
+
+            $query = $this->buildPreferencesQuery($preferredData);
 
             return $this->articleRepository->optimizedSearch($query);
         });
+    }
+
+    private function buildPreferencesQuery(array $preferredData): array
+    {
+        $should = [];
+
+        foreach ($preferredData as $key => $data){
+            foreach ($data as $datum){
+                $should[] = [
+                    'match_phrase' => [
+                        $key => $datum
+                    ]
+                ];
+            }
+        }
+
+        return [
+            'bool' => [
+                'should'               => $should,
+                'minimum_should_match' => 1,
+            ],
+        ];
     }
 
     /**
@@ -86,13 +78,13 @@ readonly class ArticleService
         $cacheKey = 'search-' . $user_id . '-' . md5(json_encode($filters, JSON_THROW_ON_ERROR));
 
         return Cache::remember($cacheKey, 3600, function() use($filters){
-            $query = empty($filters) ? ['match_all' => []] : $this->buildQueryForFilters($filters);
+            $query = empty($filters) ? ['match_all' => []] : $this->buildFilterQuery($filters);
 
             return $this->articleRepository->optimizedSearch($query);
         });
     }
 
-    private function buildQueryForFilters(array $filters): array
+    private function buildFilterQuery(array $filters): array
     {
         $mustQuery = [
             'must' => [],
@@ -112,6 +104,7 @@ readonly class ArticleService
             $mustQuery['must'][] = [
                 'match' => [
                     'category' => $filters['category'],
+                    'fuzziness' => "AUTO"
                 ],
             ];
         }
@@ -120,6 +113,7 @@ readonly class ArticleService
             $mustQuery['must'][] = [
                 'match' => [
                     'source' => $filters['source'],
+                    'fuzziness' => "AUTO"
                 ],
             ];
         }

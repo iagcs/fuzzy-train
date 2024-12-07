@@ -31,6 +31,7 @@ readonly class ArticleRepository
     public function optimizedSearch(array $query): array
     {
         $body = [
+            'size' => 200,
             'query' => $query
         ];
 
