@@ -32,11 +32,16 @@ readonly class ElasticService
      */
     public function search(array $body)
     {
-        $response = $this->client->search([
-            'index' => 'articles',
-            ...$body
-        ]);
+        try {
+            $response = $this->client->search([
+                'index' => 'articles',
+                ...$body
+            ]);
 
-        return $response['hits']['hits'];
+            return $response['hits']['hits'];
+        } catch (\Exception $e) {
+            \Log::error('Failed to search inside index: '.$e->getMessage());
+            throw $e;
+        }
     }
 }
