@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-
-use app\Models\User;
+use Modules\User\Models\User;
 
 class LoginService
 {

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read \app\Models\User $resource
+ * @property-read \Modules\User\Models\User $resource
  */
 class LoginResource extends JsonResource
 {
