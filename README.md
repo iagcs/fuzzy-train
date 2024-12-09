@@ -29,7 +29,7 @@ This is a **news aggregation system** that automatically retrieves and consolida
 - Elasticsearch 
 
 ### Elasticseacrh
-You will need a elasticsearch key to use, and you can put in .env
+To use Elasticsearch in your project, you will need to set up the appropriate credentials. Please add the following entries to your .env file:
 
 ```dotenv
 ELASTIC_CLOUD_ID=
@@ -37,7 +37,17 @@ ELASTIC_API_KEY=
 ELASTIC_HTTPS=false
 ```
 
-API'S
+### Daily Command: FetchNewsApiData
+
+The command that runs daily to fetch news data is called `FetchNewsApiData`. It is located inside the `Modules\Article\Console` directory of the project.
+
+To view or customize this command, navigate to the directory:
+
+```bash
+Modules/Article/app/Console/FetchNewsApiData.php
+```
+
+### API'S
 You will also need api key for the news apis
 
 ```dotenv
