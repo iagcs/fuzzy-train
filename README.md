@@ -26,7 +26,30 @@ This is a **news aggregation system** that automatically retrieves and consolida
 - Docker
 - Docker Compose
 - PostgreSQL or compatible database
-- Elasticsearch running in a Docker container (configured via Docker Compose)
+- Elasticsearch 
+
+### Elasticseacrh
+You will need a elasticsearch key to use, and you can put in .env
+
+```dotenv
+ELASTIC_CLOUD_ID=
+ELASTIC_API_KEY=
+ELASTIC_HTTPS=false
+```
+
+API'S
+You will also need api key for the news apis
+
+```dotenv
+NEWS_API_KEY=
+NEWS_API_URL=https://newsapi.org/v2
+
+THE_GUARDIAN_API_KEY=
+THE_GUARDIAN_API_URL=https://content.guardianapis.com
+
+NEW_YORK_TIMES_KEY=
+NEW_YORK_TIMES_URL=https://api.nytimes.com
+```
 
 ### Steps to Use Docker
 
