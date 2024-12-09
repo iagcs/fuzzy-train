@@ -3,14 +3,15 @@
 namespace Modules\Article\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Article\Models\Article;
 
-class ArticleDatabaseSeeder extends Seeder
+class ArticleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // $this->call([]);
+        Article::factory()->create(100);
     }
 }
