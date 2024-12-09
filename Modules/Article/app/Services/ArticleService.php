@@ -12,11 +12,11 @@ use Modules\User\Enums\ValidSearchFields;
 use Modules\User\Models\User;
 use Modules\User\Repositories\UserRepository;
 
-readonly class ArticleService
+class ArticleService
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private ArticleRepository $articleRepository
+        private readonly UserRepository $userRepository,
+        private readonly ArticleRepository $articleRepository
     ) {
     }
 

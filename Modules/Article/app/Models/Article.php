@@ -3,8 +3,9 @@
 namespace Modules\Article\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Article\Database\Factories\ArticleFactory;
 
 // use Modules\Article\Database\Factories\ArticleFactory;
 
@@ -25,8 +26,8 @@ class Article extends Model
         'published_at'
     ];
 
-    // protected static function newFactory(): ArticleFactory
-    // {
-    //     // return ArticleFactory::new();
-    // }
+     protected static function newFactory(): ArticleFactory
+     {
+          return ArticleFactory::new();
+     }
 }

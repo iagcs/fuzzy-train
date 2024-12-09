@@ -7,9 +7,9 @@ use Illuminate\Support\Collection;
 use Modules\Article\DTOs\ArticleDto;
 use Modules\Article\Models\Article;
 
-readonly class ArticleRepository
+class ArticleRepository
 {
-    public function __construct(private ElasticService $elasticService) {}
+    public function __construct(private readonly ElasticService $elasticService) {}
 
     public function insert(array $data): void
     {
